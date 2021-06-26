@@ -1,0 +1,8 @@
+Sime#7379 : Welcome to your ticket <@736636650796351559>. Please be patient, staff will be with you soon. ||<@&846254636263276584>||
+Sime#7379 : Here are commands you may need
+Sime#7379 : 
+ToLaCut#0001 : s!transcript
+ToLaCut#0001 : hi
+ToLaCut#0001 : s!transcipt
+ToLaCut#0001 : s!close
+Sime#7379 : This ticket will be closed in 5 seconds...
