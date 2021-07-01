@@ -27,6 +27,13 @@ const levelSchema = require('./models/leveling');
 const punishDatabase = require('./models/punishment');
 const chatBot = require('./models/chatbot');
 const fetch = require('node-fetch');
+const express = require('express')
+const app = express();
+      strategy = require("passport-discord").Strategy,
+      session = require("express-session"),
+      passport = require("passport");
+const port = process.env.PORT || 5000
+const path = require('path')
 const permsList = [
   "ADMINISTRATOR",
   "CREATE_INSTANT_INVITE",
@@ -66,6 +73,8 @@ mongoose.connect(
     useUnifiedTopology: true,
     useNewUrlParser: true
   })
+mongoose.connection.on("error", console.error.bind(console, "Database Error"));
+mongoose.connection.once("open", () => console.log("Database Connected"));
 
 Levels.setURL(process.env.MONGO_DB)
 
@@ -90,6 +99,9 @@ const player = new distube(sime, {
 
 module.exports = sime;
 
+/* Dashboard */
+
+
 /* Math */
 sime.math = function(type, a, b) {
   let result
@@ -105,6 +117,8 @@ sime.math = function(type, a, b) {
   return result
 }
 
+sime.queue = new Discord.Collection()
+sime.mongoose = mongoose
 sime.discordTogether = new DiscordTogether(sime);
 sime.Levels = Levels
 sime.config = config
@@ -612,52 +626,6 @@ sime.on('messageDelete', async (message) => {
   await sime.snipes.set(message.channel.id, snipes)
 })
 
-/* Anti Make Changes Event */
-sime.on('channelCreate', async (channel) => {
-  const da = await sime.mongo.get(`antiMakeChanges_${channel.guild.id}`) || false
-  if(da == false) return;
-  channel.guild.fetchAuditLogs()
-    .then(async (audit) => {
-      const member = await channel.guild.members.cache.get(audit.entries.first().executor.id)
-      if (!member) return channel.delete(`I can't define who created this channel. Auto deleting...`)
-      if(member.id == sime.user.id) return
-      const Data = await authorizationRoles.findOne({ Guild: channel.guild.id })
-      if(Data) {
-      if (Data.Role) {
-      Data.Role.map(async (r) => {
-        const role = await channel.guild.roles.cache.find(rol => rol.id == r)
-        if (!role) {
-          const newRole = Data.Role.filter(chh => chh !== r)
-          Data.Role = newRole
-          Data.save()
-        } else {
-          if (member.roles.cache.get(role.id)) {
-            if(await sime.mongo.has(`antiMakeChangesWhitelisted_${member.id}_${channel.guild.id}`)) {
-            } else {
-              await sime.mongo.set(`antiMakeChangesWhitelisted_${member.id}_${channel.guild.id}`, false)
-              }
-          } else {
-
-          }
-        }
-      })
-    }
-      }
-  const Data12 = await sime.mongo.get(`antiMakeChangesWhitelisted_${member.id}_${channel.guild.id}`) || true
-  if(Data12 == true) {
-    if(await sime.mongo.has(`antiMakeChangesWhitelisted_${member.id}_${channel.guild.id}`)) {
-      await sime.mongo.delete(`antiMakeChangesWhitelisted_${member.id}_${channel.guild.id}`)
-    }
-    channel.delete(`Anti Make Changes - ${member.user.id} is not allowed to make changes`)
-    member.user.send(new Discord.MessageEmbed().setTitle(`Anti Make Changes`).setDescription(`You can't create a channel because you don't have Authorization Role.`).setColor("RED"))
-  } else if(Data12 == false) {
-    if(await sime.mongo.has(`antiMakeChangesWhitelisted_${member.id}_${channel.guild.id}`)) {
-      await sime.mongo.delete(`antiMakeChangesWhitelisted_${member.id}_${channel.guild.id}`)
-    }
-  }
-    })
-})
-
 /* Counting Event */
 sime.on('message', async(message) => {
   if(!message.guild) return
@@ -677,4 +645,240 @@ sime.on('message', async(message) => {
   }
   ServerData.Number++;
   ServerData.save()
+})
+
+/* Website */
+app.listen(port, () => console.log(`Sime 's Website is listening on port ${port}`))
+app.get('/' , (req, res) => {
+  res.sendFile(path.join(__dirname, ".", "botPages", "mainPage.html"))
+    })
+app.get('/commands' , (req, res) => {
+      res.sendFile(path.join(__dirname, ".", "botPages", "404.html"))
+})
+    app.get('/premium' , (req, res) => {
+      res.sendFile(path.join(__dirname, ".", "botPages", "404.html"))
+    })
+    app.get('/invite', (req, res) => {
+      res.redirect('https://discord.com/oauth2/authorize?client_id=843073453708017716&scope=bot&permissions=470084735')
+    })
+    app.get('/support', (req, res) => {
+      res.redirect('https://discord.gg/wchWg5Aayt')
+    })
+    app.use(function(req, res) {
+  res.status(404).sendFile(path.join(__dirname, ".", "botPages", "404.html"))
+})
+
+/* Anti Raid Event */
+sime.on('channelCreate', async (channel) => {
+  const da = await sime.mongo.get(`antiMakeChanges_${channel.guild.id}`) || false
+  if(da == false) return;
+  let limit = await sime.mongo.get(`channelCreateLimit_${channel.guild.id}`)
+  if(!limit) return console.log(`Bruhh - channelCreate`)
+  let action = await sime.mongo.get(`action_${channel.guild.id}`)
+  if(!action || !(["ban","kick","removeroles"]).includes(action.toLowerCase())) await sime.mongo.set(`action_${channel.guild.id}`, "removeroles");
+  action = await sime.mongo.get(`action_${channel.guild.id}`)
+  await channel.guild.fetchAuditLogs({ type:"CHANNEL_CREATE" })
+    .then(async (audit) => {
+      const member = await channel.guild.members.cache.get(audit.entries.first().executor.id)
+      if (!member || member.id == channel.guild.owner.id) return
+      const trustedList = await sime.mongo.get(`trustedusers_${channel.guild.id}`)
+      let logs = await sime.mongo.get(`logs_${channel.guild.id}`)
+      let author = await sime.mongo.get(`executer_${channel.guild.id}_${member.id}_channelCreate`)
+      if(logs) {
+        logs = await sime.channels.cache.get(logs) || "No Channel";    
+      } else {
+        logs = "No Channel"
+      }
+      if(trustedList && trustedList.find(r => r.user == member.id)) {
+        return
+      } else if(trustedList && !trustedList.find(r => r.user == member.id)) {
+        if(!author) {
+          await sime.mongo.set(`executer_${channel.guild.id}_${member.id}_channelCreate`, 1)
+        } else {
+          await sime.mongo.add(`executer_${channel.guild.id}_${member.id}_channelCreate`, 1)
+        }
+        if(await sime.mongo.get(`executer_${channel.guild.id}_${member.id}_channelCreate`) >= limit) {
+          if(action.toLowerCase() == "ban") {
+            try {
+              member.send(`You were banned from **${channel.guild.name}** because you reached channelCreate's limit.`)
+            } catch {
+
+            }
+            await member.ban({ reason: `Reached channelCreate's event limit (${limit})` })
+            if(logs !== "No Channel") {
+                try {
+                  logs.send(new Discord.MessageEmbed()
+                    .setTitle(`ANTI RAID NOTICE`)
+                    .setDescription(`${member.user.tag} has created a channel without Trusted by an Administrator (is not in Trusted List). And they reached channelCreate event's limit. **${member.user.tag}** was banned`)
+                    .setColor("RED")
+                  )
+                } catch {
+                  console.log(`I can't send message to Logs Channel`)
+                }
+              }
+          } else if(action.toLowerCase() == "kick") {
+            try {
+              member.send(`You were kicked from **${channel.guild.name}** because you reached channelCreate's limit.`)
+            } catch {
+
+            }
+            await member.kick(`Reached channelCreate's event limit (${limit})`)
+            if(logs !== "No Channel") {
+                try {
+                  logs.send(new Discord.MessageEmbed()
+                    .setTitle(`ANTI RAID NOTICE`)
+                    .setDescription(`${member.user.tag} has created a channel without Trusted by an Administrator (is not in Trusted List). And they reached channelCreate event's limit. **${member.user.tag}** was kicked`)
+                    .setColor("RED")
+                  )
+                } catch {
+                  console.log(`I can't send message to Logs Channel`)
+                }
+              }
+          } else if(action.toLowerCase() == "removeroles") {
+            
+          member.roles.cache.filter(r => !r.managed && r.position < channel.guild.me.roles.highest.position).map(async (r) => {
+              await member.roles.remove(r)
+            
+            })
+            if(logs !== "No Channel") {
+                try {
+                  logs.send(new Discord.MessageEmbed()
+                    .setTitle(`ANTI RAID NOTICE`)
+                    .setDescription(`${member.user.tag} has created a channel without Trusted by an Administrator (is not in Trusted List). And they reached channelCreate event's limit, all of their roles was removed`)
+                    .setColor("RED")
+                  )
+                } catch {
+                  console.log(`I can't send message to Logs Channel`)
+                }
+                member.send(`You have been removed all the roles on **${channel.guild.name}** because you reached channelCreate's limit.`)
+              }
+           }
+           await sime.mongo.delete(`executer_${channel.guild.id}_${member.id}_channelCreate`)
+            } else {
+              if(logs !== "No Channel") {
+                try {
+                  logs.send(new Discord.MessageEmbed()
+                    .setTitle(`ANTI RAID NOTICE`)
+                    .setDescription(`${member.user.tag} has created a channel without Trusted by an Administrator (is not in Trusted List). Now **${member.user.tag}** has **${await sime.mongo.get(`executer_${channel.guild.id}_${member.id}_channelCreate`)} warns**`)
+                    .setColor("RED")
+                  )
+                } catch {
+                  console.log(`I can't send message to Logs Channel`)
+                }
+                member.send(`You have been given a warn in **${channel.guild.name}** because you aren't trusted users`)
+              }
+            }
+          }
+        await channel.delete({ reason: `Anti Raid - ${member.user.tag} is not allowed to create channel.` })
+    })
+})
+
+sime.on('channelDelete', async (channel) => {
+  const da = await sime.mongo.get(`antiMakeChanges_${channel.guild.id}`) || false
+  if(da == false) return;
+  let limit = await sime.mongo.get(`channelDeleteLimit_${channel.guild.id}`)
+  if(!limit) return console.log(`Bruhh - channelDelete`)
+  let action = await sime.mongo.get(`action_${channel.guild.id}`)
+  if(!action || !(["ban","kick","removeroles"]).includes(action.toLowerCase())) await sime.mongo.set(`action_${channel.guild.id}`, "removeroles");
+  action = await sime.mongo.get(`action_${channel.guild.id}`)
+  await channel.guild.fetchAuditLogs({ type:"CHANNEL_DELETE" 
+  })
+    .then(async (audit) => {
+      const member = await channel.guild.members.cache.get(audit.entries.first().executor.id)
+      if (!member || member.id == channel.guild.owner.id) return
+      const trustedList = await sime.mongo.get(`trustedusers_${channel.guild.id}`)
+      let logs = await sime.mongo.get(`logs_${channel.guild.id}`)
+      let author = await sime.mongo.get(`executer_${channel.guild.id}_${member.id}_channelDelete`)
+      if(logs) {
+        logs = await sime.channels.cache.get(logs) || "No Channel";    
+      } else {
+        logs = "No Channel"
+      }
+      if(trustedList && trustedList.find(r => r.user == member.id)) {
+        return
+      } else if(trustedList && !trustedList.find(r => r.user == member.id)) {
+        if(!author) {
+          await sime.mongo.set(`executer_${channel.guild.id}_${member.id}_channelDelete`, 1)
+        } else {
+          await sime.mongo.add(`executer_${channel.guild.id}_${member.id}_channelDelete`, 1)
+        }
+        if(await sime.mongo.get(`executer_${channel.guild.id}_${member.id}_channelDelete`) >= limit) {
+          if(action.toLowerCase() == "ban") {
+            try {
+              member.send(`You were banned from **${channel.guild.name}** because you reached channelDelete's limit.`)
+            } catch {
+
+            }
+            await member.ban({ reason: `Reached channelDelete's event limit (${limit})` })
+            if(logs !== "No Channel") {
+                try {
+                  logs.send(new Discord.MessageEmbed()
+                    .setTitle(`ANTI RAID NOTICE`)
+                    .setDescription(`${member.user.tag} has deleted a channel without Trusted by an Administrator (is not in Trusted List). And they reached channelDelete event's limit. **${member.user.tag}** was banned`)
+                    .setColor("RED")
+                  )
+                } catch {
+                  console.log(`I can't send message to Logs Channel`)
+                }
+              }
+          } else if(action.toLowerCase() == "kick") {
+            try {
+              member.send(`You were kicked from **${channel.guild.name}** because you reached channelDelete's limit.`)
+            } catch {
+
+            }
+            await member.kick(`Reached channelDelete's event limit (${limit})`)
+            if(logs !== "No Channel") {
+                try {
+                  logs.send(new Discord.MessageEmbed()
+                    .setTitle(`ANTI RAID NOTICE`)
+                    .setDescription(`${member.user.tag} has deleted a channel without Trusted by an Administrator (is not in Trusted List). And they reached channelCreate event's limit. **${member.user.tag}** was kicked`)
+                    .setColor("RED")
+                  )
+                } catch {
+                  console.log(`I can't send message to Logs Channel`)
+                }
+              }
+          } else if(action.toLowerCase() == "removeroles") {
+            
+          member.roles.cache.filter(r => !r.managed && r.position < channel.guild.me.roles.highest.position).map(async (r) => {
+              await member.roles.remove(r)
+            
+            })
+            if(logs !== "No Channel") {
+                try {
+                  logs.send(new Discord.MessageEmbed()
+                    .setTitle(`ANTI RAID NOTICE`)
+                    .setDescription(`${member.user.tag} has deleted a channel without Trusted by an Administrator (is not in Trusted List). And they reached channelCreate event's limit, all of their roles was removed`)
+                    .setColor("RED")
+                  )
+                } catch {
+                  console.log(`I can't send message to Logs Channel`)
+                }
+                member.send(`You have been removed all the roles on **${channel.guild.name}** because you reached channelDelete's limit.`)
+              }
+           }
+           await sime.mongo.delete(`executer_${channel.guild.id}_${member.id}_channelDelete`)
+            } else {
+              if(logs !== "No Channel") {
+                try {
+                  logs.send(new Discord.MessageEmbed()
+                    .setTitle(`ANTI RAID NOTICE`)
+                    .setDescription(`${member.user.tag} has deleted a channel without Trusted by an Administrator (is not in Trusted List). Now **${member.user.tag}** has **${await sime.mongo.get(`executer_${channel.guild.id}_${member.id}_channelDelete`)} warns**`)
+                    .setColor("RED")
+                  )
+                } catch {
+                  console.log(`I can't send message to Logs Channel`)
+                }
+                member.send(`You have been given a warn in **${channel.guild.name}** because you aren't trusted users`)
+              }
+            }
+          }
+    })
+})
+
+/* Music */
+sime.on('voiceStateUpdate', async(old,New)=>{
+    if(old.id !== sime.user.id) return
+    if(old.channelID && !New.channelID) sime.queue.delete(old.guild.id)
 })

@@ -35,11 +35,11 @@ module.exports = async (sime, message) => {
                 if(modRole == null) {
                   if (!message.member.permissions.has(command.userPerms || [])) return message.lineReply(`You need \`${command.userPerms.join("` `") || []}\` to run this command !`);
                  if (!message.guild.me.permissions.has(command.botPerms || []) && !message.channel.permissionsFor(sime.user.id).has(command.botPerms || [])) return message.lineReply(`I require \`${command.botPerms.join("` `") || []}\` permissions !`);
-                  if(cooldown.has(`${command.name}${authorID}`)) return message.lineReply(`Current Cooldown for **${command.name}** is \`${ms(command.cooldown * 1000, { long: true })}\``)
+                  if(cooldown.has(`${command.name}${mesage.author.id}`)) return message.lineReply(`Current Cooldown for **${command.name}** is \`${ms(command.cooldown * 1000, { long: true })}\``)
             command.run(sime, message, args)
-            cooldown.set(`${command.name}${authorID}`, Date.now() + command.cooldown)
+            cooldown.set(`${command.name}${message.author.id}`, Date.now() + command.cooldown)
             setTimeout(() => {
-                cooldown.delete(`${command.name}${authorID}`)
+                cooldown.delete(`${command.name}${message.author.id}`)
             }, command.cooldown * 1000)
                 } else {
                   let used = false
@@ -51,21 +51,21 @@ module.exports = async (sime, message) => {
                     }
                   }
                   if(used = false) return message.lineReply(`You need \`${command.userPerms.join("` `") || []}\` or Moderator Role to run this command !`)
-                  if(cooldown.has(`${command.name}${authorID}`)) return message.lineReply(`Current Cooldown for **${command.name}** is \`${ms(command.cooldown * 1000, { long: true })}\``)
+                  if(cooldown.has(`${command.name}${amessage.author.iduthorID}`)) return message.lineReply(`Current Cooldown for **${command.name}** is \`${ms(command.cooldown * 1000, { long: true })}\``)
             command.run(sime, message, args)
-            cooldown.set(`${command.name}${authorID}`, Date.now() + command.cooldown)
+            cooldown.set(`${command.name}${message.author.id}`, Date.now() + command.cooldown)
             setTimeout(() => {
-                cooldown.delete(`${command.name}${authorID}`)
+                cooldown.delete(`${command.name}${message.author.id}`)
             }, command.cooldown * 1000)
                 }
               } else {
                 if (!message.member.permissions.has(command.userPerms || [])) return message.lineReply(`You need \`${command.userPerms.join("` `") || []}\` to run this command !`);
                  if (!message.guild.me.permissions.has(command.botPerms || []) && !message.channel.permissionsFor(sime.user.id).has(command.botPerms || [])) return message.lineReply(`I require \`${command.botPerms.join("` `") || []}\` permissions !`);
-                  if(cooldown.has(`${command.name}${authorID}`)) return message.lineReply(`Current Cooldown for **${command.name}** is \`${ms(command.cooldown * 1000, { long: true })}\``)
+                  if(cooldown.has(`${command.name}${message.author.id}`)) return message.lineReply(`Current Cooldown for **${command.name}** is \`${ms(command.cooldown * 1000, { long: true })}\``)
             command.run(sime, message, args)
-            cooldown.set(`${command.name}${authorID}`, Date.now() + command.cooldown)
+            cooldown.set(`${command.name}${message.author.id}`, Date.now() + command.cooldown)
             setTimeout(() => {
-                cooldown.delete(`${command.name}${authorID}`)
+                cooldown.delete(`${command.name}${message.author.id}`)
             }, command.cooldown * 1000)
               }
         } else {
@@ -101,11 +101,11 @@ module.exports = async (sime, message) => {
                 if(modRole == null) {
                   if (!message.member.permissions.has(command.userPerms || [])) return message.lineReply(`You need \`${command.userPerms.join("` `") || []}\` to run this command !`);
                  if (!message.guild.me.permissions.has(command.botPerms || []) && !message.channel.permissionsFor(sime.user.id).has(command.botPerms || [])) return message.lineReply(`I require \`${command.botPerms.join("` `") || []}\` permissions !`);
-                  if(cooldown.has(`${command.name}${authorID}`)) return message.lineReply(`Current Cooldown for **${command.name}** is \`${ms(command.cooldown * 1000, { long: true })}\``)
+                  if(cooldown.has(`${command.name}${message.author.id}`)) return message.lineReply(`Current Cooldown for **${command.name}** is \`${ms(command.cooldown * 1000, { long: true })}\``)
             command.run(sime, message, args)
-            cooldown.set(`${command.name}${authorID}`, Date.now() + command.cooldown)
+            cooldown.set(`${command.name}${message.author.id}`, Date.now() + command.cooldown)
             setTimeout(() => {
-                cooldown.delete(`${command.name}${authorID}`)
+                cooldown.delete(`${command.name}${message.author.id}`)
             }, command.cooldown * 1000)
                 } else {
                   let used = false
@@ -117,21 +117,21 @@ module.exports = async (sime, message) => {
                     }
                   }
                   if(used = false) return message.lineReply(`You need \`${command.userPerms.join("` `") || []}\` or Moderator Role to run this command !`)
-                  if(cooldown.has(`${command.name}${authorID}`)) return message.lineReply(`Current Cooldown for **${command.name}** is \`${ms(command.cooldown * 1000, { long: true })}\``)
+                  if(cooldown.has(`${command.name}${message.author.id}`)) return message.lineReply(`Current Cooldown for **${command.name}** is \`${ms(command.cooldown * 1000, { long: true })}\``)
             command.run(sime, message, args)
-            cooldown.set(`${command.name}${authorID}`, Date.now() + command.cooldown)
+            cooldown.set(`${command.name}${message.author.id}`, Date.now() + command.cooldown)
             setTimeout(() => {
-                cooldown.delete(`${command.name}${authorID}`)
+                cooldown.delete(`${command.name}${message.author.id}`)
             }, command.cooldown * 1000)
                 }
               } else {
                 if (!message.member.permissions.has(command.userPerms || [])) return message.lineReply(`You need \`${command.userPerms.join("` `") || []}\` to run this command !`);
                  if (!message.guild.me.permissions.has(command.botPerms || []) && !message.channel.permissionsFor(sime.user.id).has(command.botPerms || [])) return message.lineReply(`I require \`${command.botPerms.join("` `") || []}\` permissions !`);
-                  if(cooldown.has(`${command.name}${authorID}`)) return message.lineReply(`Current Cooldown for **${command.name}** is \`${ms(command.cooldown * 1000, { long: true })}\``)
+                  if(cooldown.has(`${command.name}${message.author.id}`)) return message.lineReply(`Current Cooldown for **${command.name}** is \`${ms(command.cooldown * 1000, { long: true })}\``)
             command.run(sime, message, args)
-            cooldown.set(`${command.name}${authorID}`, Date.now() + command.cooldown)
+            cooldown.set(`${command.name}${message.author.id}`, Date.now() + command.cooldown)
             setTimeout(() => {
-                cooldown.delete(`${command.name}${authorID}`)
+                cooldown.delete(`${command.name}${message.author.id}`)
             }, command.cooldown * 1000)
               }
         } else {

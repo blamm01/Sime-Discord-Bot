@@ -20,12 +20,11 @@ module.exports.run = async (sime, message, args) => {
   if(!database || !database.length) return message.channel.send(`There is no members in Trusted List`)
   let data = database.find(x => x.user === member.id)
   if(!data) return message.channel.send(`**${member.user.tag}** is not in Trusted List`)
-  let value = database.indexOf(data)
-  delete database[value]
           
-  var filter = database.filter(x => {
-              return x != null && x != ''
-  })
+  var filterNew = database.filter(x => x.user !== member.id)
+  
+  await sime.mongo.set(`trustedusers_${message.guild.id}`, filterNew)
+  
 
   message.channel.send(`**${member.user.tag}** was removed from Trusted List`)
 
