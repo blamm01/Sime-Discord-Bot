@@ -9,7 +9,8 @@ module.exports = {
     categories: "Moderation",
     example: 'removepunish B87k5AQHrf',
     usage: '[Member]',
-    userPerms: ['MANAGE_MESSAGES']
+    userPerms: ['MANAGE_MESSAGES'],
+    modRole: true
 }
 
 module.exports.run = async(sime, message, args) => {

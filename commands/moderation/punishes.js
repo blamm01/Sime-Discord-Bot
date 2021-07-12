@@ -8,7 +8,8 @@ module.exports = {
     categories: "Moderation",
     example: 'warnings 736636650796351559',
     usage: '[Member]',
-    userPerms: ['MANAGE_MESSAGES']
+    userPerms: ['MANAGE_MESSAGES'],
+    modRole: true
 }
 
 module.exports.run = async(sime, message, args) => {

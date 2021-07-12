@@ -6,7 +6,7 @@ module.exports = {
     usage: '<LogChannel/Disable>',
     description: "Change Settings Of Report Module",
     example: `report-settings 32 No way...`,
-    categories: 'Report',
+    categories: 'Reports',
     userPerms: ["ADMINISTRATOR"]
 }
 

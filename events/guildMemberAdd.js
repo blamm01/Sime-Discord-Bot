@@ -35,15 +35,18 @@ module.exports = async(sime, member) => {
                 name: `${captcha}.png`
             }]
         });
+        db.set(`modmail_${member.user.id}`, `Choosing`);
         try {
             const filter = m => m.author.id == member.id
             const response = await msg.channel.awaitMessages(filter, { max: 1, time: 60000, errors: ['time']});
             if(response.first().content == captcha) {
+              db.delete(`modmail_${member.user.id}`);
                 await member.send(':white_check_mark: You entered correct captcha ! Just wait me a second');
                 await member.roles.add(roleVerified, `Captcha Correct`);
                 await fs.unlink(`${__dirname}/captchas/${captcha}.png`)
                   .catch(err => console.log(err));
             } else if(response.first().content !== captcha) {
+              db.delete(`modmail_${member.user.id}`);
                 await member.send(`:x: You entered incorrect captcha ! Kicking...`)
                 await member.kick(`Captcha Incorrect`)
                 return;
@@ -52,7 +55,7 @@ module.exports = async(sime, member) => {
             console.log(`Oops ${member.id} didn't enter the code. But it's ok !`)
         }
     } catch(err) {
-        await console.log(`I can't DM that user`)
+        await console.log(err)
     }
 })
 if(db.has(`autorole_${member.guild.id}`)) {

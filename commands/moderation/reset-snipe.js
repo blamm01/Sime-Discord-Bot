@@ -8,6 +8,7 @@ module.exports = {
     example: `snipe #general`,
     userPerms: ['MANAGE_MESSAGES'],
     categories: 'Moderation',
+    modRole: true
 }
 
 module.exports.run = async(sime, message, args) => {

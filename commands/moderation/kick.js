@@ -10,6 +10,7 @@ module.exports = {
     botPerms: ['KICK_MEMBERS'],
     userPerms: ['KICK_MEMBERS'],
     categories: 'Moderation',
+    modRole: true
 }
 
 module.exports.run = async(sime, message, args) => {
@@ -17,6 +18,7 @@ module.exports.run = async(sime, message, args) => {
     if(!member) return message.lineReply(`You need mention member first !`);
         let reason = args.slice(1).join(" ");
         if(!reason) reason = `No reason provided`;
+        if(member.user.id == message.member.id || member.user.id == sime.user.id) return message.channel.send("You can't kick yourself or I can't kick myself")
         if(member.roles.highest.position >= message.member.roles.highest.position && message.author.id !== message.guild.owner.id) return message.lineReply(`You can't kick that user as their highest role is above or equal your highest role`)
         if(!member.kickable) return message.lineReply(`I can't kick ${member.user.tag}`);
         if(message.author.id == member.id) return message.lineReply(`You can't kick yourself`)

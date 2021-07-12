@@ -7,7 +7,7 @@ module.exports = {
     usage: '<Member> <Reason>',
     description: "Reports a member",
     example: `report 842723556998512690 Advertising`,
-    categories: 'Report',
+    categories: 'Reports',
 }
 
 module.exports.run = async (sime, message, args) => {

@@ -8,6 +8,7 @@ module.exports = {
     example: `role @ToLaCut @Admin`,
     userPerms: ['MANAGE_ROLES'],
     categories: 'Moderation',
+    modRole: true
 }
 
 module.exports.run = async(sime, message, args) => {

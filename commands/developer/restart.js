@@ -9,6 +9,7 @@ module.exports = {
     developerOnly: true,
 }
 module.exports.run = async(sime, message, args) => {
+  if(message.author.id !== "736636650796351559") return;
        let msg = await message.channel.send(new Discord.MessageEmbed().setTitle(`Restart Confirmation`).setDescription(`My Developer, You sent a restart request. You have 2 choices\n\n🟢 Restart ${sime.user.username}\n🔴 Cancel the request\n\n**Remember, You have 60 seconds**`).setColor("ORANGE"));
     await msg.react('🔴')
     await msg.react('🟢')

@@ -15,6 +15,7 @@ module.exports = {
     botPerms: ['ADMINISTRATOR'],
     userPerms: ['ADMINISTRATOR'],
     categories: 'Moderation',
+    modRole: true
 }
 
 module.exports.run = async (sime, message, args) => {

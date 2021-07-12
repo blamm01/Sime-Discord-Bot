@@ -7,7 +7,7 @@ module.exports = {
     usage: '<Report Case>',
     description: "Shows Information of a report",
     example: `report-info 32`,
-    categories: 'Report',
+    categories: 'Reports',
 }
 
 module.exports.run = async (sime, message, args) => {

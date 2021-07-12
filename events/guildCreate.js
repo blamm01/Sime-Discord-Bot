@@ -7,18 +7,6 @@ const { MessageEmbed } = require('discord.js')
 let channelList = []
 
 module.exports = async(sime, guild) => {
-  await guild.channels.cache.filter(c => c.permissionsFor(sime.user.id).has(["SEND_MESSAGES"]) && c.permissionsFor(sime.user.id).has(["VIEW_CHANNEL"])).map(ch => {
-    channelList.push(ch.id)
-  })
-    const channelIndex = Math.floor(Math.random() * channelList);
-    const randomChannel = channelList[channelIndex]
-    const channelToSend = await guild.channels.cache.find(c => c.id == randomChannel);
-    if(channelToSend) {
-      await channelToSend.send(new MessageEmbed().setTitle(`Thank you`)
-      .setColor("#00fff2")
-      .setDescription(`Thank you for invite **${sime.user.username}** to this server. My Default prefix is **${prefix}**. If you want to change it,use the \`prefix\` command. Use \`help\` for all commands`)
-      )
-    }
     let owner = await sime.users.cache.find(c => c.id == owner1)
     let addRemoveChannel = await sime.channels.cache.find(c => c.id == channel)
     if(!addRemoveChannel) { 

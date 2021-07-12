@@ -16,11 +16,13 @@ module.exports = {
     botPerms: ['MANAGE_ROLES'],
     userPerms: ['MANAGE_MESSAGES'],
     categories: 'Moderation',
+    modRole: true
 }
 
 module.exports.run = async (sime, message, args) => {
     const member = await message.mentions.members.first() || message.guild.members.cache.get(args[0])
     if (!member) return message.lineReply(`You need mention member first`)
+    if(member.user.id == message.member.id || member.user.id == sime.user.id) return message.channel.send("You can't unmute yourself or I can't unmute myself")
         let reason = args.slice(1).join(" ")
         if (!reason) reason = "No reason provided"
         if (member.roles.highest.position >= message.member.roles.highest.position && message.author.id !== message.guild.owner.id) return message.lineReply(`You can't unmute that user as their highest role is above or equal your highest role`)

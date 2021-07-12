@@ -8,6 +8,7 @@ module.exports = {
     categories: "Moderation",
     userPerms: ["ADMINISTRATOR"],
     example: 'clearserverpunish',
+    modRole: true
 }
 
 module.exports.run = async(sime, message, args) => {

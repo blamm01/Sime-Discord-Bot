@@ -9,11 +9,16 @@ module.exports = {
     botPerms: ['MANAGE_CHANNELS'],
     userPerms: ['MANAGE_CHANNELS'],
     categories: 'Moderation',
+    modRole: true
 }
 
 module.exports.run = async(sime, message, args) => {
     const channel = await message.mentions.channels.first() || message.guild.channels.cache.get(args[0]) || message.guild.channels.cache.find(f => f.name == args[0]) || message.channel
-    var position = channel.position
+    var position = channel.position;
+    let newChannel = await channel.clone()
+    await newChannel.setPosition(position);
+    await channel.delete(`${message.author.tag}`);
+    newChannel.send(`:white_check_mark: Nuked this channel`).then(msg => msg.delete({ timeout: '10000' }))
     const data = await logging.findOne({ Guild: message.guild.id })
     if(!data || !data.Channel || !data.WebhookID || !data.WebhookToken) return;
     const webhookclient = new WebhookClient(
@@ -28,8 +33,4 @@ module.exports.run = async(sime, message, args) => {
         }]
     })
     	.catch(err => { console.log(err); data.delete() })
-   	let newChannel = await channel.clone()
-    await newChannel.setPosition(position);
-    await channel.delete(`${message.author.tag}`);
-    newChannel.send(`:white_check_mark: Nuked this channel`).then(msg => msg.delete({ timeout: '10000' }))
 }

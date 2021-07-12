@@ -12,6 +12,7 @@ module.exports = {
     example: `lock #general Staff Days`,
     botPerms: ['MANAGE_ROLES'],
     userPerms: ['MANAGE_MESSAGES',"MANAGE_ROLES"],
+    modRole: true
 }
 
 module.exports.run = async (sime, message, args) => {

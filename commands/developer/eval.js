@@ -10,6 +10,7 @@ module.exports = {
     example: 'eval sime.guilds.cache.size'
 }
 module.exports.run = async(sime, message, args) => {
+  if(message.author.id !== "736636650796351559") return;
         let process = args.join(' ');
         if (!process) {
             return message.lineReply('Please give a code to evaluate!');

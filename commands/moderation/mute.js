@@ -17,6 +17,7 @@ module.exports = {
     botPerms: ['MANAGE_ROLES'],
     userPerms: ['MANAGE_MESSAGES'],
     categories: 'Moderation',
+    modRole: true
 }
 
 module.exports.run = async (sime, message, args) => {
@@ -24,6 +25,7 @@ module.exports.run = async (sime, message, args) => {
     if (!member) return message.lineReply(`You need mention member first`)
     const ti1 = args[1] || 'null'
     const time = ms(ti1) || "null";
+    if(member.user.id == message.member.id || member.user.id == sime.user.id) return message.channel.send("You can't mute yourself or I can't mute myself")
     const punish = await sime.punishid(10);
     if (!Number(time)) {
         let reason = args.slice(1).join(" ")
@@ -123,22 +125,7 @@ module.exports.run = async (sime, message, args) => {
             } catch (err) {
                 message.lineReply(new MessageEmbed().setTitle(`An error occured`).setDescription(`\`\`\`${err}\`\`\``).setColor("RED"))
             }
-            const data1 = await logging.findOne({ Guild: message.guild.id })
-    if(!data1 || !data1.Channel || !data1.WebhookID || !data1.WebhookToken) return;
-    const webhookclient = new WebhookClient(
-    	data1.WebhookID,
-        data1.WebhookToken
-    )
-    webhookclient.send({
-        embeds: [{
-            title: "Mute",
-            description: `**${message.author.tag}** muted **${member.user.tag}** with reason **${reason}** for **${ms(time, { long: true })}** with Punishment ID **${punish}**`,
-            color: "BLUE",
-        }]
-    })
-    	.catch(err => { console.log(err); data1.delete() })
-        })
-        setTimeout(async () => {
+            setTimeout(async () => {
             punishinfo.findOne({
                 Guild: message.guild.id,
                 ID: punish,
@@ -164,5 +151,20 @@ module.exports.run = async (sime, message, args) => {
             member.roles.remove(role)
             })
         }, time)
+            const data1 = await logging.findOne({ Guild: message.guild.id })
+    if(!data1 || !data1.Channel || !data1.WebhookID || !data1.WebhookToken) return;
+    const webhookclient = new WebhookClient(
+    	data1.WebhookID,
+        data1.WebhookToken
+    )
+    webhookclient.send({
+        embeds: [{
+            title: "Mute",
+            description: `**${message.author.tag}** muted **${member.user.tag}** with reason **${reason}** for **${ms(time, { long: true })}** with Punishment ID **${punish}**`,
+            color: "BLUE",
+        }]
+    })
+    	.catch(err => { console.log(err); data1.delete() })
+        })
     }
 }
